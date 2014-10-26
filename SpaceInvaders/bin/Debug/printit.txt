@@ -1,0 +1,19 @@
+
+25/10/2014  14:42         2,275,328 libsndfile-1.dll
+05/10/2013  18:17         1,000,974 libstdc++-6.dll
+25/10/2014  14:42           456,704 openal32.dll
+25/10/2014  14:42           110,161 sfml-audio-2.dll
+25/10/2014  14:42           650,517 sfml-audio-d-2.dll
+25/10/2014  14:42         1,273,750 sfml-graphics-2.dll
+25/10/2014  14:42         2,762,787 sfml-graphics-d-2.dll
+25/10/2014  14:42           186,987 sfml-network-2.dll
+25/10/2014  14:42           787,744 sfml-network-d-2.dll
+25/10/2014  14:42            73,631 sfml-system-2.dll
+25/10/2014  14:42           289,286 sfml-system-d-2.dll
+25/10/2014  14:42           129,198 sfml-window-2.dll
+25/10/2014  14:42           748,150 sfml-window-d-2.dll
+25/10/2014  22:44         1,172,757 SpaceInvaders.exe
+25/10/2014  16:49               478 sprite1.png
+25/03/2002  15:36            29,340 terminat.ttf
+              17 File(s)     11,947,792 bytes
+               2 Dir(s)  34,376,368,128 bytes free
