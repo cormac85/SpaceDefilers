@@ -14,6 +14,8 @@ int main()
 
     sf::Clock clock;
     sf::Time elapsed;
+    sf::Clock bulletClock;
+    sf::Time bulletTime;
 
     //load the font & check error
     sf::Font font;
@@ -35,10 +37,12 @@ int main()
     // create  empty shapes
     sf::ConvexShape player;
     sf::ConvexShape bullet;
+    sf::ConvexShape defiler;
 
     // resize it to 5 points
     player.setPointCount(8);
     bullet.setPointCount(4);
+    defiler.setPointCount(6);
 
     // define the points & set color
     player.setPoint(0, sf::Vector2f(0, 30));
@@ -51,13 +55,29 @@ int main()
     player.setPoint(7, sf::Vector2f(0, 50));
     player.setFillColor(sf::Color(255, 255, 255));
 
+    defiler.setPoint(0, sf::Vector2f(0, 15));
+    defiler.setPoint(1, sf::Vector2f(15, 0));
+    defiler.setPoint(2, sf::Vector2f(35, 0));
+    defiler.setPoint(3, sf::Vector2f(50, 15));
+    defiler.setPoint(4, sf::Vector2f(35, 30));
+    defiler.setPoint(5, sf::Vector2f(15, 30));
+    defiler.setFillColor(sf::Color(255, 255, 255));
+    defiler.setOrigin(sf::Vector2f(25, 15));
+    defiler.setPosition((screenSize.x * 0.5), screenSize.y * 0.25 );
+
     bullet.setPoint(0, sf::Vector2f(0, 0));
     bullet.setPoint(1, sf::Vector2f(10, 0));
     bullet.setPoint(2, sf::Vector2f(10, 20));
     bullet.setPoint(3, sf::Vector2f(0, 20));
     bullet.setFillColor(sf::Color(255, 255, 255));
-    bullet.setOrigin(sf::Vector2f(5,10));
+    bullet.setOrigin(sf::Vector2f(5, 10));
     bool bulletExists = false;
+
+
+
+    sf::FloatRect bulletBoxSize = bullet.getGlobalBounds();
+    sf::FloatRect playerBoxSize = player.getGlobalBounds();
+    sf::FloatRect defilerBoxSize = defiler.getGlobalBounds();
 
 
     //define a sprite and texture.
@@ -90,13 +110,9 @@ int main()
 
         while (window.pollEvent(event))
         {
-            switch(event.type)
             // "close requested" event: we close the window
-            {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-            }
+            if (event.type == sf::Event::Closed)
+                window.close();
         }
         //check all keyboard inputs since last iteration
         if ( sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -104,19 +120,20 @@ int main()
             std::cout << "the escape key was pressed, exiting..." << std::endl;
             window.close();
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
             std::cout << "left" << std::endl;
             playerSpeed.x = -3;
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         {
             std::cout << "right" << std::endl;
             playerSpeed.x = 3;
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && bulletExists == false )
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (bulletExists == false) )
         {
-
+            bulletExists = true;
+            bullet.setPosition(sf::Vector2f(playerPos.x, (playerPos.y - 35)));
         }
 
 
@@ -128,18 +145,44 @@ int main()
 
         playerPos = player.getPosition();
 
+        //stop player going out of bounds.
         if( playerPos.x > screenSize.x - 16 )
         {
             player.setPosition((screenSize.x - 16),playerPos.y);
-            playerSpeed.x = 0;
         }
         else if (playerPos.x < 16)
         {
             player.setPosition(16,playerPos.y);
-            playerSpeed.x = 0;
         }
-        player.move(sf::Vector2f(playerSpeed.x,playerSpeed.y));
+        player.setPosition((playerPos.x + playerSpeed.x), playerPos.y );//move the player
+        playerSpeed.x = 0;//stop player moving until keyboard input confirmed on next loop.
 
+        //move the bullet
+        sf::Vector2f bulletPos = bullet.getPosition();
+        bullet.setPosition(bulletPos.x, (bulletPos.y - 3));
+
+        //check bullet is out of bounds and remove
+        if (bulletPos.y > -20)
+        {
+            window.draw(bullet);
+        }
+        else if (bulletPos.y < -20)
+        {
+            bulletExists = false;
+        }
+
+        if (bullet.getGlobalBounds().intersects(defiler.getGlobalBounds()))
+        {
+            bulletExists = false;
+            std::cout << "Collision!" << std::endl;
+            bullet.setPosition(-100, -100);
+            defiler.setPosition(-200, -200);
+
+        }
+        else
+        {
+            window.draw(defiler);
+        }
         //draw text and sprites
         elapsed = clock.getElapsedTime();
         if( elapsed.asSeconds() < 3)
@@ -149,6 +192,7 @@ int main()
         //switched to shape, not using sprite now.
         //window.draw(sprite);
         window.draw(player);
+
 
         // display the frame we just drew.
         window.display();
