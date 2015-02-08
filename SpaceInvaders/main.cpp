@@ -21,7 +21,7 @@ int main()
     sf::Font font;
     if (!font.loadFromFile("terminat.ttf"))
     {
-        std::cerr << "Oh shit, file don't load!" << std::endl;
+        std::cerr << "Oh shit, font file didn't load!" << std::endl;
     }
     //declare a text variable and set it's font, then initialise content, size, colour etc.
     sf::Text text;
@@ -39,7 +39,7 @@ int main()
     sf::ConvexShape bullet;
     sf::ConvexShape defiler;
 
-    // resize it to 5 points
+    // resize it to required number of points
     player.setPointCount(8);
     bullet.setPointCount(4);
     defiler.setPointCount(6);
