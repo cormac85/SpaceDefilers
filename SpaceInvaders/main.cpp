@@ -9,7 +9,7 @@ int main()
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window.setFramerateLimit(120);
+    window.setFramerateLimit(60);
    //window.setVerticalSyncEnabled(true);
 
     sf::Clock clock;
@@ -34,72 +34,25 @@ int main()
     sf::FloatRect textBoxSize = text.getGlobalBounds();
     text.setPosition((screenSize.x/2 - (textBoxSize.width/2)), 50);
 
-    // create  empty shapes
-    sf::ConvexShape player;
-    sf::ConvexShape bullet;
-    sf::ConvexShape defiler;
-
-    // resize it to required number of points
-    player.setPointCount(8);
-    bullet.setPointCount(4);
-    defiler.setPointCount(6);
-
-    // define the points & set color
-    player.setPoint(0, sf::Vector2f(0, 30));
-    player.setPoint(1, sf::Vector2f(15, 30));
-    player.setPoint(2, sf::Vector2f(15, 20));
-    player.setPoint(3, sf::Vector2f(35, 20));
-    player.setPoint(4, sf::Vector2f(35, 30));
-    player.setPoint(5, sf::Vector2f(50, 30));
-    player.setPoint(6, sf::Vector2f(50, 50));
-    player.setPoint(7, sf::Vector2f(0, 50));
-    player.setFillColor(sf::Color(255, 255, 255));
-
-    defiler.setPoint(0, sf::Vector2f(0, 15));
-    defiler.setPoint(1, sf::Vector2f(15, 0));
-    defiler.setPoint(2, sf::Vector2f(35, 0));
-    defiler.setPoint(3, sf::Vector2f(50, 15));
-    defiler.setPoint(4, sf::Vector2f(35, 30));
-    defiler.setPoint(5, sf::Vector2f(15, 30));
-    defiler.setFillColor(sf::Color(255, 255, 255));
-    defiler.setOrigin(sf::Vector2f(25, 15));
-    defiler.setPosition((screenSize.x * 0.5), screenSize.y * 0.25 );
-
-    bullet.setPoint(0, sf::Vector2f(0, 0));
-    bullet.setPoint(1, sf::Vector2f(10, 0));
-    bullet.setPoint(2, sf::Vector2f(10, 20));
-    bullet.setPoint(3, sf::Vector2f(0, 20));
-    bullet.setFillColor(sf::Color(255, 255, 255));
-    bullet.setOrigin(sf::Vector2f(5, 10));
-    bool bulletExists = false;
-
-
-
-    sf::FloatRect bulletBoxSize = bullet.getGlobalBounds();
-    sf::FloatRect playerBoxSize = player.getGlobalBounds();
-    sf::FloatRect defilerBoxSize = defiler.getGlobalBounds();
 
 
     //define a sprite and texture.
-    sf::Sprite sprite;
+    sf::Sprite playerSprite;
     sf::Texture texture;
 
     //load texture, check for errors.
-    if (!texture.loadFromFile("sprite1.png", sf::IntRect(0, 0, 32, 32)))
+    if (!texture.loadFromFile("sprite1.png", sf::IntRect(0, 0, 31, 19)))
     {
-        std::cerr << "Error";
+        std::cerr << "Error loading player texture" << std::endl;
     }
     //give the texture to the sprite and then move the sprite initial position.
-    sprite.setTexture(texture);
-    sprite.setOrigin(sf::Vector2f(16, 16));
-    sprite.setPosition(sf::Vector2f(screenSize.x/2, screenSize.y*0.9));
-
-    //move origin of player shape to its centre and initialise to bottom of screen with
-    player.setOrigin( sf::Vector2f(25,25));
-    player.setPosition(sf::Vector2f(screenSize.x/2, screenSize.y*0.9));
+    playerSprite.setTexture(texture);
+    playerSprite.setOrigin(sf::Vector2f(15, 15));
+    playerSprite.setPosition(sf::Vector2f(screenSize.x/2, screenSize.y*0.9));
 
     sf::Vector2f playerSpeed(0, 0);
-    sf::Vector2f playerPos = player.getPosition();
+    sf::Vector2f playerMovementSpeed(5,0);
+    sf::Vector2f playerPos = playerSprite.getPosition();
 
 
     // run the program as long as the window is open
@@ -123,19 +76,13 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
             std::cout << "left" << std::endl;
-            playerSpeed.x = -3;
+            playerSpeed.x = -playerMovementSpeed.x;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         {
             std::cout << "right" << std::endl;
-            playerSpeed.x = 3;
+            playerSpeed.x = playerMovementSpeed.x;
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (bulletExists == false) )
-        {
-            bulletExists = true;
-            bullet.setPosition(sf::Vector2f(playerPos.x, (playerPos.y - 35)));
-        }
-
 
         // clear the window with black color
         window.clear(sf::Color::Black);
@@ -143,56 +90,32 @@ int main()
         /*do calculations here for
         all the text and sprites*/
 
-        playerPos = player.getPosition();
+        playerPos = playerSprite.getPosition();
 
         //stop player going out of bounds.
-        if( playerPos.x > screenSize.x - 16 )
+        if( playerPos.x > screenSize.x)
         {
-            player.setPosition((screenSize.x - 16),playerPos.y);
+            playerSprite.setPosition((screenSize.x - 100),playerPos.y);
         }
         else if (playerPos.x < 16)
         {
-            player.setPosition(16,playerPos.y);
+            playerSpeed.x=0;
         }
-        player.setPosition((playerPos.x + playerSpeed.x), playerPos.y );//move the player
+        playerSprite.setPosition((playerPos.x + playerSpeed.x), playerPos.y );//move the player
         playerSpeed.x = 0;//stop player moving until keyboard input confirmed on next loop.
 
-        //move the bullet
-        sf::Vector2f bulletPos = bullet.getPosition();
-        bullet.setPosition(bulletPos.x, (bulletPos.y - 3));
 
-        //check bullet is out of bounds and remove
-        if (bulletPos.y > -20)
-        {
-            window.draw(bullet);
-        }
-        else if (bulletPos.y < -20)
-        {
-            bulletExists = false;
-        }
 
-        if (bullet.getGlobalBounds().intersects(defiler.getGlobalBounds()))
-        {
-            bulletExists = false;
-            std::cout << "Collision!" << std::endl;
-            bullet.setPosition(-100, -100);
-            defiler.setPosition(-200, -200);
 
-        }
-        else
-        {
-            window.draw(defiler);
-        }
+
         //draw text and sprites
         elapsed = clock.getElapsedTime();
-        if( elapsed.asSeconds() < 3)
+        if(elapsed.asSeconds() < 3)
         {
             window.draw(text);
         }
-        //switched to shape, not using sprite now.
-        //window.draw(sprite);
-        window.draw(player);
 
+        window.draw(playerSprite);
 
         // display the frame we just drew.
         window.display();
